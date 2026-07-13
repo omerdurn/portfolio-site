@@ -987,6 +987,45 @@
             box-shadow: var(--shadow-glow);
         }
 
+        .visitor-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-light);
+            transition: all 0.3s ease;
+        }
+
+        .visitor-counter:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .visitor-counter svg {
+            opacity: 0.7;
+        }
+
+        .visitor-count {
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .visitor-label {
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         /* Animations on scroll - Apple style */
         .reveal {
             opacity: 0;
@@ -1809,6 +1848,14 @@
         </button>
 
         <footer>
+            <div class="visitor-counter" id="visitorCounter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span class="visitor-count" id="visitorCount">---</span>
+                <span class="visitor-label" data-tr="ziyaretçi" data-en="visitors">visitors</span>
+            </div>
             <p>&copy; 2026 Ömer Duran. <span data-tr="Tüm hakları saklıdır." data-en="All rights reserved.">All rights reserved.</span></p>
             <div class="footer-social">
                 <a href="https://instagram.com/omerfarukduraan" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link">
@@ -2116,6 +2163,16 @@
                 }, { once: true });
             });
         });
+
+        // ============ VISITOR COUNTER ============
+        fetch('https://api.countapi.xyz/hit/omerduran.me/visits')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('visitorCount').textContent = data.value.toLocaleString();
+            })
+            .catch(() => {
+                document.getElementById('visitorCount').textContent = '0';
+            });
     </script>
 </body>
 </html>
