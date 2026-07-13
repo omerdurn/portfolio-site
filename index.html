@@ -2165,10 +2165,10 @@
         });
 
         // ============ VISITOR COUNTER ============
-        fetch('https://api.countapi.xyz/hit/omerduran.me/visits')
+        fetch('https://countapi.mileshilliard.com/api/v1/hit/omerduran-me-visits')
             .then(r => r.json())
             .then(data => {
-                document.getElementById('visitorCount').textContent = data.value.toLocaleString();
+                document.getElementById('visitorCount').textContent = parseInt(data.value).toLocaleString();
             })
             .catch(() => {
                 document.getElementById('visitorCount').textContent = '0';
