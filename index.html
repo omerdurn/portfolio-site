@@ -2463,165 +2463,23 @@
                 document.getElementById('visitorCount').textContent = '0';
             });
 
-        // ============ CHATBOT ============
+        // ============ AI CHATBOT ============
         const chatFab = document.getElementById('chatbotFab');
         const chatWindow = document.getElementById('chatbotWindow');
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const chatSend = document.getElementById('chatSend');
+        const WORKER_URL = 'https://omerduran-chatbot.omerfarukduran7.workers.dev';
 
-        const responses = {
-            tr: {
-                greetings: {
-                    keywords: ['merhaba', 'selam', 'hey', 'hello', 'hi', 'naber', 'nasılsın'],
-                    reply: 'Merhaba! Ben Ömer\'in dijital asistanıyım. Onun hakkında sorularınızı yanıtlayabilirim. Ne öğrenmek istersiniz?',
-                    suggestions: ['Ömer kim?', 'Projeleri neler?', 'İletişim']
-                },
-                who: {
-                    keywords: ['kim', 'kimsin', 'tanıt', 'bilgi', 'öğren', 'anlat', 'ömer kim', 'kişi', 'insan'],
-                    reply: 'Ömer Duran, Bilkent Üniversitesi Elektrik-Elektronik Mühendisliği 2. sınıf öğrencisi. Yazılım mühendisliği stajları arıyor. IEEE üyesi, IELTS 6.5 sahibi.',
-                    suggestions: ['Projeleri', 'Yetenekleri', 'İletişim']
-                },
-                projects: {
-                    keywords: ['proje', 'projeleri', 'yaptığı', 'hangi proje', 'çalışma', 'çalışmaları', 'fpga', 'radyo'],
-                    reply: 'Şu ana kadar iki ana projesi var:\n\n🛡️ FPGA Security System — FPGA tabanlı实时 zamanlı güvenlik sistemi, donanım seviyesinde intrusion detection\n\n📻 Analog Radio — Analog radyo devresi tasarımı ve prototipleme',
-                    suggestions: ['FPGA projesi', 'Radyo projesi', 'Tüm projeler']
-                },
-                fpga: {
-                    keywords: ['fpga', 'fpga projesi', 'güvenlik', 'security', 'güvenlik sistemi', 'intrusion'],
-                    reply: 'FPGA Security System projesi: FPGA (Xilinx Spartan-6) üzerinde gerçek zamanlı ağ güvenlik izleme sistemi. Donanım hızlandırmalı intrusion detection ve real-time packet analysis özelliklerine sahip.',
-                    suggestions: ['Radyo projesi', 'Yetenekleri', 'İletişim']
-                },
-                radio: {
-                    keywords: ['radyo', 'analog', 'analog radyo', 'radyo projesi'],
-                    reply: 'Analog Radio projesi: Analog radyo devresi tasarımı. RF devreleri, filtre tasarımı ve sinyal işleme konularında pratik deneyim kazandıran bir proje.',
-                    suggestions: ['FPGA projesi', 'Yetenekleri', 'İletişim']
-                },
-                skills: {
-                    keywords: ['yetenek', 'yetenekleri', 'skill', 'uzmanlık', 'ne biliyor', 'teknoloji', 'programlama', 'araçlar', 'tool'],
-                    reply: 'Ömer\'in temel yetenekleri:\n\n💻 Programlama: C, Python, MATLAB, VHDL\n🔧 Araçlar: Xilinx ISE, MATLAB/Simulink, Git\n📊 Diğer: PCB tasarımı, FPGA geliştirme, sinyal işleme',
-                    suggestions: ['Projeleri', 'Eğitimi', 'İletişim']
-                },
-                education: {
-                    keywords: ['eğitim', 'okul', 'üniversite', 'bilkent', 'not', 'gpa', 'derece', 'bölüm', 'sınıf'],
-                    reply: '🎓 Bilkent Üniversitesi\nElektrik-Elektronik Mühendisliği\n2. Sınıf | GPA: 2.30/4.00',
-                    suggestions: ['Yetenekleri', 'Projeleri', 'Hobileri']
-                },
-                contact: {
-                    keywords: ['iletişim', 'ulaş', 'numara', 'telefon', 'email', 'eposta', 'whatsapp', 'instagram', 'github', 'nasıl ulaşırım'],
-                    reply: 'İletişim bilgileri:\n📧 Email: omefarukduran7@gmail.com\n📱 WhatsApp: +90 543 728 8068\n📸 Instagram: @omerfarukduraan\n💻 GitHub: github.com/omerdurn',
-                    suggestions: ['Ömer kim?', 'Projeleri', 'Yetenekleri']
-                },
-                hobbies: {
-                    keywords: ['hobi', 'hobileri', 'boş zaman', 'spor', 'bodybuilding', 'futbol', 'galatasaray', 'ne yapar'],
-                    reply: 'Ömer\'in hobileri:\n🏋️ Bodybuilding (3 yıldır aktif)\n⚽ Eski futbolcu\n🏆 Galatasaray taraftarı',
-                    suggestions: ['Eğitimi', 'Projeleri', 'İletişim']
-                },
-                language: {
-                    keywords: ['dil', 'ingilizce', 'türkçe', 'ielts', 'yabancı dil', 'lisans'],
-                    reply: 'Dil bilgisi:\n🇹🇷 Türkçe — Ana dil\n🇬🇧 İngilizce — IELTS 6.5',
-                    suggestions: ['Yetenekleri', 'Eğitimi', 'Projeleri']
-                },
-                thanks: {
-                    keywords: ['teşekkür', 'sağol', 'eyvallah', 'thanks', 'thank you', 'çok iyi', 'harika'],
-                    reply: 'Rica ederim! Başka bir sorunuz varsa yardımcı olmaktan mutluluk duyarım 😊',
-                    suggestions: ['Ömer kim?', 'Projeleri', 'İletişim']
-                },
-                default: {
-                    keywords: [],
-                    reply: 'Bu konuda bilgim yok, ama Ömer hakkında başka sorularınızı yanıtlayabilirim. Şu konularda yardımcı olabilirim:',
-                    suggestions: ['Ömer kim?', 'Projeleri', 'Yetenekleri', 'İletişim']
-                }
-            },
-            en: {
-                greetings: {
-                    keywords: ['hey', 'hello', 'hi', 'how are you', 'whats up', 'sup'],
-                    reply: 'Hi! I\'m Ömer\'s digital assistant. I can answer questions about him. What would you like to know?',
-                    suggestions: ['Who is Ömer?', 'His projects', 'Contact']
-                },
-                who: {
-                    keywords: ['who', 'about', 'introduce', 'tell me', 'what do you know', 'explain', 'who is'],
-                    reply: 'Ömer Duran is a 2nd year Electrical & Electronics Engineering student at Bilkent University. He\'s looking for software engineering internships. IEEE member, IELTS 6.5.',
-                    suggestions: ['Projects', 'Skills', 'Contact']
-                },
-                projects: {
-                    keywords: ['project', 'projects', 'work', 'what did he build', 'portfolio'],
-                    reply: 'He has two main projects:\n\n🛡️ FPGA Security System — Real-time security system on FPGA with hardware-level intrusion detection\n\n📻 Analog Radio — Analog radio circuit design and prototyping',
-                    suggestions: ['FPGA project', 'Radio project', 'All projects']
-                },
-                fpga: {
-                    keywords: ['fpga', 'security', 'security system', 'intrusion'],
-                    reply: 'FPGA Security System: A real-time network security monitoring system on Xilinx Spartan-6 FPGA. Features hardware-accelerated intrusion detection and real-time packet analysis.',
-                    suggestions: ['Radio project', 'Skills', 'Contact']
-                },
-                radio: {
-                    keywords: ['radio', 'analog', 'analog radio'],
-                    reply: 'Analog Radio project: Analog radio circuit design. Hands-on experience with RF circuits, filter design, and signal processing.',
-                    suggestions: ['FPGA project', 'Skills', 'Contact']
-                },
-                skills: {
-                    keywords: ['skill', 'skills', 'expertise', 'what can he do', 'tech', 'technologies', 'programming', 'languages'],
-                    reply: 'Ömer\'s key skills:\n\n💻 Programming: C, Python, MATLAB, VHDL\n🔧 Tools: Xilinx ISE, MATLAB/Simulink, Git\n📊 Other: PCB design, FPGA development, signal processing',
-                    suggestions: ['Projects', 'Education', 'Contact']
-                },
-                education: {
-                    keywords: ['education', 'school', 'university', 'bilkent', 'gpa', 'degree', 'major', 'year'],
-                    reply: '🎓 Bilkent University\nElectrical & Electronics Engineering\n2nd Year | GPA: 2.30/4.00',
-                    suggestions: ['Skills', 'Projects', 'Hobbies']
-                },
-                contact: {
-                    keywords: ['contact', 'reach', 'phone', 'email', 'whatsapp', 'instagram', 'github', 'how to reach'],
-                    reply: 'Contact info:\n📧 Email: omefarukduran7@gmail.com\n📱 WhatsApp: +90 543 728 8068\n📸 Instagram: @omerfarukduraan\n💻 GitHub: github.com/omerdurn',
-                    suggestions: ['About', 'Projects', 'Skills']
-                },
-                hobbies: {
-                    keywords: ['hobby', 'hobbies', 'free time', 'sports', 'bodybuilding', 'football', 'galatasaray'],
-                    reply: 'Ömer\'s hobbies:\n🏋️ Bodybuilding (3 years)\n⚽ Former football player\n🏆 Galatasaray fan',
-                    suggestions: ['Education', 'Projects', 'Contact']
-                },
-                languages: {
-                    keywords: ['language', 'english', 'turkish', 'ielts', 'foreign'],
-                    reply: 'Languages:\n🇹🇷 Turkish — Native\n🇬🇧 English — IELTS 6.5',
-                    suggestions: ['Skills', 'Education', 'Projects']
-                },
-                thanks: {
-                    keywords: ['thank', 'thanks', 'thx', 'great', 'awesome', 'nice'],
-                    reply: 'You\'re welcome! If you have any other questions, I\'m happy to help 😊',
-                    suggestions: ['Who is Ömer?', 'Projects', 'Contact']
-                },
-                default: {
-                    keywords: [],
-                    reply: 'I don\'t have info on that, but I can answer other questions about Ömer. Here\'s what I can help with:',
-                    suggestions: ['Who is Ömer?', 'Projects', 'Skills', 'Contact']
-                }
-            }
-        };
+        const chatHistory = [];
 
         function detectLanguage(input) {
             const trChars = /[çğıöşüÇĞİÖŞÜ]/;
-            const trKeywords = ['merhaba', 'selam', 'hey', 'naber', 'nasıl', 'nedir', 'kim', 'hakkında', 'projeleri', 'projeler', 'yetenek', 'yetenekleri', 'iletişim', 'telefon', 'eğitim', 'hobileri', 'hobi', 'teşekkür', 'sağol', 'hakkında', 'anlat', 'göster'];
+            const trKeywords = ['merhaba', 'selam', 'hey', 'naber', 'nasıl', 'nedir', 'kim', 'hakkında', 'projeleri', 'projeler', 'yetenek', 'yetenekleri', 'iletişim', 'telefon', 'eğitim', 'hobileri', 'hobi', 'teşekkür', 'sağol', 'anlat', 'göster'];
             const text = input.toLowerCase();
             if (trChars.test(input)) return 'tr';
             if (trKeywords.some(kw => text.includes(kw))) return 'tr';
             return 'en';
-        }
-
-        function getResponse(input) {
-            const text = input.toLowerCase().trim();
-            const inputLang = detectLanguage(input);
-            const langResponses = responses[inputLang] || responses.en;
-
-            // Check specific categories first, then general ones
-            const priorityOrder = ['fpga', 'radio', 'greetings', 'thanks', 'who', 'projects', 'skills', 'education', 'contact', 'hobbies', 'languages', 'language', 'default'];
-
-            for (const category of priorityOrder) {
-                const data = langResponses[category];
-                if (!data) continue;
-                if (data.keywords.some(kw => text.includes(kw))) {
-                    return data;
-                }
-            }
-            return langResponses.default;
         }
 
         function addMessage(text, type, suggestions) {
@@ -2660,17 +2518,51 @@
             if (el) el.remove();
         }
 
-        function handleUserInput(text) {
+        function formatReply(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background:var(--bg-card-hover);padding:0.1em 0.4em;border-radius:4px;font-size:0.85em">$1</code>');
+        }
+
+        async function handleUserInput(text) {
             if (!text.trim()) return;
             addMessage(text, 'user');
             chatInput.value = '';
 
+            chatHistory.push({ role: 'user', content: text });
+
             addTyping();
-            setTimeout(() => {
+
+            try {
+                const res = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        history: chatHistory.slice(-10),
+                    }),
+                });
+
                 removeTyping();
-                const response = getResponse(text);
-                addMessage(response.reply, 'bot', response.suggestions);
-            }, 600 + Math.random() * 400);
+
+                if (!res.ok) {
+                    const lang = document.documentElement.getAttribute('lang') || 'en';
+                    const errMsg = lang === 'tr' ? 'Bir hata oluştu. Lütfen tekrar deneyin.' : 'Something went wrong. Please try again.';
+                    addMessage(errMsg, 'bot');
+                    return;
+                }
+
+                const data = await res.json();
+                const reply = formatReply(data.reply);
+                chatHistory.push({ role: 'assistant', content: data.reply });
+                addMessage(reply, 'bot');
+            } catch (err) {
+                removeTyping();
+                const lang = document.documentElement.getAttribute('lang') || 'en';
+                const errMsg = lang === 'tr' ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.' : 'Connection error. Please check your internet connection.';
+                addMessage(errMsg, 'bot');
+            }
         }
 
         chatFab.addEventListener('click', () => {
@@ -2678,7 +2570,7 @@
             chatFab.classList.toggle('active');
             if (isOpen && chatMessages.children.length === 0) {
                 const lang = document.documentElement.getAttribute('lang') || 'en';
-                const greeting = lang === 'tr' ? 'Merhaba! Ben Ömer\'in dijital asistanıyım. size nasıl yardımcı olabilirim?' : 'Hi! I\'m Ömer\'s digital assistant. How can I help you?';
+                const greeting = lang === 'tr' ? 'Merhaba! Ben Ömer\'in AI asistanıyım. Onun hakkında sorularınızı yanıtlayabilirim. Size nasıl yardımcı olabilirim?' : 'Hi! I\'m Ömer\'s AI assistant. I can answer questions about him. How can I help you?';
                 const suggestions = lang === 'tr' ? ['Ömer kim?', 'Projeleri', 'Yetenekleri'] : ['Who is Ömer?', 'Projects', 'Skills'];
                 addMessage(greeting, 'bot', suggestions);
             }
